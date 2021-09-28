@@ -11,7 +11,7 @@ class ArtistsCards extends React.Component {
           {`Resultado de álbuns de: ${bandName}`}
         </p>
         {bandInfo.map(({ collectionId, artworkUrl100, collectionName, artistName }) => (
-          <>
+          <div key={ collectionId }>
             <Link
               to={ `/album/${collectionId}` }
               data-testid={ `link-to-album-${collectionId}` }
@@ -21,7 +21,7 @@ class ArtistsCards extends React.Component {
             <img src={ artworkUrl100 } alt="Album Cover" />
             <p>{ collectionName }</p>
             <p>{ artistName }</p>
-          </>
+          </div>
         ))}
       </div>
     );
