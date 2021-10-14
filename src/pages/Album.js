@@ -10,7 +10,8 @@ class Album extends React.Component {
     this.state = {
       getAlbum: '',
       getBand: '',
-      getAll: '',
+      getImage: '',
+      getAll: [],
     };
   }
 
@@ -24,19 +25,21 @@ class Album extends React.Component {
     this.setState({
       getAlbum: musics[0].collectionName,
       getBand: musics[0].artistName,
-      getAll: musics,
+      getImage: musics[0].artworkUrl100,
+      getAll: [...musics],
     });
-    console.log(musics);
   }
 
   render() {
-    const { getAlbum, getBand, getAll } = this.state;
+    const { getAlbum, getBand, getAll, getImage } = this.state;
     return (
       <div data-testid="page-album">
         <Header />
         <p data-testid="artist-name">{`${getBand}`}</p>
         <p data-testid="album-name">{`${getAlbum}`}</p>
-        <MusicCard getAll={ getAll } />
+        <img src={ getImage } alt={ `Album: ${getAlbum}` } />
+        { getAll.slice(1)
+          .map((music, index) => <MusicCard music={ music } key={ index } />) }
       </div>
     );
   }

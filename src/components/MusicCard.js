@@ -9,73 +9,80 @@ class MusicCard extends React.Component {
 
     this.state = {
       loading: false,
-      // favoriteTracks: [],
+      checked: false,
     };
   }
 
-  // componentDidMount() {
-  //   this.fetchFavoriteSongs();
-  // }
+  componentDidMount() {
+    this.recoverFavoriteSongs();
+  }
 
-  handleChange = async (event, music) => {
+  handleChange = async (event) => {
+    console.log(event.target.checked);
+    console.log(event.target.id);
+    this.setState({
+      loading: true,
+    });
     if (event.target.checked) {
-      this.setState({ loading: true });
-      await addSong(music);
-      this.setState({ loading: false });
+      await addSong(event.target.id);
+      console.log('funcionou');
+      this.setState({
+        loading: false,
+        checked: true,
+      });
     } else {
-      this.setState({ loading: true });
-      await removeSong(music);
-      this.setState({ loading: false });
+      await removeSong(event.target.id);
+      console.log('tambem funcionou');
+      this.setState({
+        loading: false,
+        checked: false,
+      });
     }
-  };
-  // https://github.com/tryber/sd-014-b-project-trybetunes/pull/102/commits/771b268527ce51c176ad60e75aa7eb750cddade6 -- unico jeito que consegui fazer sem selecionar todos os box ao mesmo tempo
+  }
 
-  // fetchFavoriteSongs = () => {
-  //   getFavoriteSongs().then((favoriteTracks) => {
-  //     this.setState({
-  //       favoriteTracks,
-  //     });
-  //   });
-  // }
+  recoverFavoriteSongs = async () => {
+    const { music } = this.props;
+    const favorited = await getFavoriteSongs();
+    const checkFavorited = favorited.some(
+      (musicFav) => music.trackId === musicFav.trackId,
+    );
+    if (checkFavorited) {
+      this.setState({ checked: true });
+    }
+  }
 
   render() {
-    const { getAll, checker } = this.props;
-    const { loading } = this.state;
-    const allLista = [...getAll];
-    allLista.shift();
+    const { music: { previewUrl, trackName, trackId } } = this.props;
+    const { loading, checked } = this.state;
 
     return (
       <div>
         {loading && <Loading />}
-        {allLista.map((music) => (
-          <div key={ music.trackId }>
-            <p>{music.trackName}</p>
-            <audio data-testid="audio-component" src={ music.previewUrl } controls>
-              <track kind="captions" />
-              O seu navegador não suporta o elemento
-              <code>audio</code>
-            </audio>
-            <label htmlFor={ music.trackId }>
-              Favorita
-              <input
-                data-testid={ `checkbox-music-${music.trackId}` }
-                type="checkbox"
-                id={ music.trackId }
-                onChange={ (event) => this.handleChange(event, music) }
-                // checked={ !checker ? true : false }
-                // checked={ favoriteTracks.some((song) => song.trackId === music.trackId) }
-              />
-            </label>
-          </div>
-        ))}
+        <div>
+          <p>{trackName}</p>
+          <audio data-testid="audio-component" src={ previewUrl } controls>
+            <track kind="captions" />
+            O seu navegador não suporta o elemento
+            <code>audio</code>
+          </audio>
+          <label htmlFor={ trackId }>
+            Favorita
+            <input
+              data-testid={ `checkbox-music-${trackId}` }
+              type="checkbox"
+              id={ trackId }
+              checked={ checked }
+              onChange={ this.handleChange }
+            />
+          </label>
+        </div>
       </div>
     );
   }
 }
 
 MusicCard.propTypes = {
-  checker: PropTypes.bool.isRequired,
-  getAll: PropTypes.arrayOf(
+  music: PropTypes.arrayOf(
     objectOf({
       previewUrl: PropTypes.string,
       trackName: PropTypes.string,
@@ -84,5 +91,5 @@ MusicCard.propTypes = {
   ).isRequired,
 
 };
-
+// tive q trocar o lugar do map, conforme luandersson me orientou. musiccard só renderiza o objeto agora.
 export default MusicCard;
